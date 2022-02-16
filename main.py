@@ -15,6 +15,10 @@ def initBar():
 
 
 def onBarMoving(event):
+    # collisions with walls
+    if event.x - barSize / 2 <= 0 or event.x + barSize / 2 >= CANVAS_WIDTH:
+        return
+    # move the bar
     can.coords(
         barId,
         event.x - barSize / 2,
@@ -27,9 +31,9 @@ def onBarMoving(event):
 def initBall():
     obj = can.create_oval(
         CANVAS_WIDTH / 2 - 5,
-        CANVAS_HEIGHT / 2 - 5,
+        CANVAS_HEIGHT - 150,
         CANVAS_WIDTH / 2 + 5,
-        CANVAS_HEIGHT / 2 + 5,
+        CANVAS_HEIGHT - 140,
         fill="white"
     )
     print("Ball created with coordinates", can.coords(obj))
@@ -38,7 +42,7 @@ def initBall():
 
 def moveBall():
     global ballHorizontalDirection, ballVerticalDirection
-    # change ball direction if necessary
+    # collisions with walls
     coords = can.coords(ballId)
     if coords[0] <= 0:
         ballHorizontalDirection = BALL_DIRECTION_RIGHT
@@ -79,6 +83,6 @@ can.pack()
 barId = initBar()
 ballId = initBall()
 
-#moveBall()
+moveBall()
 
 fen.mainloop()
