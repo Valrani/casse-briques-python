@@ -4,9 +4,9 @@ from tkinter import *
 def initBar():
     obj = can.create_rectangle(
         CANVAS_WIDTH / 2 - barSize / 2,
-        CANVAS_HEIGHT - 100,
+        CANVAS_HEIGHT - BAR_OFFSET_FROM_BOTTOM,
         CANVAS_WIDTH / 2 + barSize / 2,
-        CANVAS_HEIGHT - 90,
+        CANVAS_HEIGHT - (BAR_OFFSET_FROM_BOTTOM + 10),
         fill="white"
     )
     can.bind('<Motion>', onBarMoving)
@@ -22,9 +22,9 @@ def onBarMoving(event):
     can.coords(
         barId,
         event.x - barSize / 2,
-        CANVAS_HEIGHT - 100,
+        CANVAS_HEIGHT - BAR_OFFSET_FROM_BOTTOM,
         event.x + barSize / 2,
-        CANVAS_HEIGHT - 90
+        CANVAS_HEIGHT - (BAR_OFFSET_FROM_BOTTOM + 10)
     )
 
 
@@ -43,33 +43,39 @@ def initBall():
 def moveBall():
     global ballHorizontalDirection, ballVerticalDirection
     # collisions with walls
-    coords = can.coords(ballId)
-    if coords[0] <= 0:
+    ballCoords = can.coords(ballId)
+    if ballCoords[0] <= 0:
         ballHorizontalDirection = BALL_DIRECTION_RIGHT
-    if coords[1] <= 0:
+    if ballCoords[1] <= 0:
         ballVerticalDirection = BALL_DIRECTION_DOWN
-    if coords[2] >= CANVAS_WIDTH:
+    if ballCoords[2] >= CANVAS_WIDTH:
         ballHorizontalDirection = BALL_DIRECTION_LEFT
-    if coords[3] >= CANVAS_HEIGHT:
+    if ballCoords[3] >= CANVAS_HEIGHT:
         ballVerticalDirection = BALL_DIRECTION_UP
+    # collisions with bar
+    if ballCoords[3] == CANVAS_HEIGHT - BAR_OFFSET_FROM_BOTTOM - 10 and ballVerticalDirection == BALL_DIRECTION_DOWN:
+        barCoords = can.coords(barId)
+        if barCoords[0] <= ballCoords[2] <= barCoords[2]:
+            ballVerticalDirection = BALL_DIRECTION_UP
     # move the ball
     can.move(ballId, ballHorizontalDirection, ballVerticalDirection)
     fen.after(ballSpeed, moveBall)
 
 
-# constants
+# constants - do not change during the execution !
 CANVAS_WIDTH = 500
 CANVAS_HEIGHT = 600
+BAR_OFFSET_FROM_BOTTOM = 100
 BALL_DIRECTION_LEFT = -5
 BALL_DIRECTION_RIGHT = 5
 BALL_DIRECTION_UP = -5
 BALL_DIRECTION_DOWN = 5
 
-# variables
+# variables - some values can be changed to tweak the gameplay
 barId = None
 barSize = 100
 ballId = None
-ballSpeed = 15
+ballSpeed = 10
 ballHorizontalDirection = BALL_DIRECTION_LEFT
 ballVerticalDirection = BALL_DIRECTION_UP
 
@@ -82,7 +88,6 @@ can.pack()
 
 barId = initBar()
 ballId = initBall()
-
 moveBall()
 
 fen.mainloop()
