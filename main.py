@@ -1,8 +1,12 @@
 from tkinter import *
 
 
+def initLevel0():
+    print()
+
+
 def initLevel1():
-    for x1 in range (25, 425, 50):
+    for x1 in range(25, 425, 50):
         if x1 not in [175, 225]:
             bricks.append(can.create_rectangle(x1, 25, x1 + 25, 50, fill=BRICK_STRENGTH_1_COLOR))
     for x1 in range(25, 425, 50):
@@ -16,16 +20,13 @@ def initLevel1():
 
 
 def initBar():
-    obj = can.create_rectangle(
+    return can.create_rectangle(
         CANVAS_WIDTH / 2 - barSize / 2,
         CANVAS_HEIGHT - BAR_OFFSET_FROM_BOTTOM,
         CANVAS_WIDTH / 2 + barSize / 2,
         CANVAS_HEIGHT - (BAR_OFFSET_FROM_BOTTOM + 10),
         fill="white"
     )
-    can.bind('<Motion>', onBarMoving)
-    print("Bar created with coordinates", can.coords(obj))
-    return obj
 
 
 def onBarMoving(event):
@@ -43,20 +44,25 @@ def onBarMoving(event):
 
 
 def initBall():
-    obj = can.create_oval(
+    return can.create_oval(
         CANVAS_WIDTH / 2 - 5,
         CANVAS_HEIGHT - 150,
         CANVAS_WIDTH / 2 + 5,
         CANVAS_HEIGHT - 140,
         fill="white"
     )
-    print("Ball created with coordinates", can.coords(obj))
-    return obj
 
 
 def moveBall():
+    checkBallCollisionsWithWalls()
+    checkBallCollisionsWithBar()
+    checkBallCollisionsWithBricks()
+    can.move(ballId, ballHorizontalDirection, ballVerticalDirection)
+    fen.after(ballSpeed, moveBall)
+
+
+def checkBallCollisionsWithWalls():
     global ballHorizontalDirection, ballVerticalDirection
-    # collisions with walls
     ballCoords = can.coords(ballId)
     if ballCoords[0] <= 0:
         ballHorizontalDirection = BALL_DIRECTION_RIGHT
@@ -66,14 +72,22 @@ def moveBall():
         ballHorizontalDirection = BALL_DIRECTION_LEFT
     if ballCoords[3] >= CANVAS_HEIGHT:
         ballVerticalDirection = BALL_DIRECTION_UP
-    # collisions with bar
+
+
+def checkBallCollisionsWithBar():
+    global ballVerticalDirection
+    ballCoords = can.coords(ballId)
     if ballCoords[3] == CANVAS_HEIGHT - BAR_OFFSET_FROM_BOTTOM - 10 and ballVerticalDirection == BALL_DIRECTION_DOWN:
         barCoords = can.coords(barId)
         if barCoords[0] - 5 <= ballCoords[2] <= barCoords[2] + 5:
             ballVerticalDirection = BALL_DIRECTION_UP
-    # move the ball
-    can.move(ballId, ballHorizontalDirection, ballVerticalDirection)
-    fen.after(ballSpeed, moveBall)
+
+
+def checkBallCollisionsWithBricks():
+    global ballHorizontalDirection, ballVerticalDirection
+    ballCoords = can.coords(ballId)
+    for brickId in bricks:
+            print()
 
 
 # constants - do not change during the execution !
@@ -106,6 +120,7 @@ can.create_image(0, 0, image=backgroundImage)
 can.pack()
 
 barId = initBar()
+can.bind('<Motion>', onBarMoving)
 ballId = initBall()
 moveBall()
 initLevel1()
