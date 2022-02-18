@@ -78,9 +78,7 @@ def checkBallCollisionsWithBar():
     global ballVerticalDirection
     ballCoords = can.coords(ballId)
     if barId in can.find_overlapping(ballCoords[0], ballCoords[1], ballCoords[2], ballCoords[3]):
-        barCoords = can.coords(barId)
-        if barCoords[0] <= ballCoords[2] <= barCoords[2]:
-            ballVerticalDirection = BALL_DIRECTION_UP
+        ballVerticalDirection = BALL_DIRECTION_UP
 
 
 def checkBallCollisionsWithBricks():
