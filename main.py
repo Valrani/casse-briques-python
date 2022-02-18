@@ -64,20 +64,20 @@ def moveBall():
 def checkBallCollisionsWithWalls():
     global ballHorizontalDirection, ballVerticalDirection
     ballCoords = can.coords(ballId)
-    if ballCoords[0] <= 0:
+    if ballCoords[X1] <= 0:
         ballHorizontalDirection = BALL_DIRECTION_RIGHT
-    if ballCoords[1] <= 0:
+    if ballCoords[Y1] <= 0:
         ballVerticalDirection = BALL_DIRECTION_DOWN
-    if ballCoords[2] >= CANVAS_WIDTH:
+    if ballCoords[X2] >= CANVAS_WIDTH:
         ballHorizontalDirection = BALL_DIRECTION_LEFT
-    if ballCoords[3] >= CANVAS_HEIGHT:
+    if ballCoords[Y2] >= CANVAS_HEIGHT:
         ballVerticalDirection = BALL_DIRECTION_UP
 
 
 def checkBallCollisionsWithBar():
     global ballVerticalDirection
     ballCoords = can.coords(ballId)
-    if barId in can.find_overlapping(ballCoords[0], ballCoords[1], ballCoords[2], ballCoords[3]):
+    if barId in can.find_overlapping(ballCoords[X1], ballCoords[Y1], ballCoords[X2], ballCoords[Y2]):
         ballVerticalDirection = BALL_DIRECTION_UP
 
 
@@ -85,7 +85,28 @@ def checkBallCollisionsWithBricks():
     global ballHorizontalDirection, ballVerticalDirection
     ballCoords = can.coords(ballId)
     for brickId in bricks:
-            print()
+        if brickId in can.find_overlapping(ballCoords[X1], ballCoords[Y1], ballCoords[X2], ballCoords[Y2]):
+            brickCoords = can.coords(brickId)
+            if ballCoords[X2] == brickCoords[X1]:
+                ballHorizontalDirection = BALL_DIRECTION_LEFT
+                hitBrick(brickId)
+            if ballCoords[Y2] == brickCoords[Y1]:
+                ballVerticalDirection = BALL_DIRECTION_UP
+                hitBrick(brickId)
+            if ballCoords[X1] == brickCoords[X2]:
+                ballHorizontalDirection = BALL_DIRECTION_RIGHT
+                hitBrick(brickId)
+            if ballCoords[Y1] == brickCoords[Y2]:
+                ballVerticalDirection = BALL_DIRECTION_DOWN
+                hitBrick(brickId)
+
+
+def hitBrick(brickId):
+    if can.itemcget(brickId, "fill") == BRICK_STRENGTH_2_COLOR:
+        can.itemconfig(brickId, fill=BRICK_STRENGTH_1_COLOR)
+    elif can.itemcget(brickId, "fill") == BRICK_STRENGTH_1_COLOR:
+        bricks.remove(brickId)
+        can.delete(brickId)
 
 
 # constants - do not change during the execution !
@@ -98,6 +119,10 @@ BALL_DIRECTION_UP = -5
 BALL_DIRECTION_DOWN = 5
 BRICK_STRENGTH_1_COLOR = "yellow"
 BRICK_STRENGTH_2_COLOR = "green"
+X1 = 0
+Y1 = 1
+X2 = 2
+Y2 = 3
 
 # variables - some values can be changed to tweak the gameplay
 barId = None
