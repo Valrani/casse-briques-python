@@ -45,9 +45,9 @@ def onBarMoving(event):
 
 def initBall():
     return can.create_oval(
-        CANVAS_WIDTH / 2 - 5,
+        (int((CANVAS_WIDTH / 2) / 5) * 5) - 5,
         CANVAS_HEIGHT - 150,
-        CANVAS_WIDTH / 2 + 5,
+        (int((CANVAS_WIDTH / 2) / 5) * 5) + 5,
         CANVAS_HEIGHT - 140,
         fill="white"
     )
@@ -77,9 +77,9 @@ def checkBallCollisionsWithWalls():
 def checkBallCollisionsWithBar():
     global ballVerticalDirection
     ballCoords = can.coords(ballId)
-    if ballCoords[3] == CANVAS_HEIGHT - BAR_OFFSET_FROM_BOTTOM - 10 and ballVerticalDirection == BALL_DIRECTION_DOWN:
+    if barId in can.find_overlapping(ballCoords[0], ballCoords[1], ballCoords[2], ballCoords[3]):
         barCoords = can.coords(barId)
-        if barCoords[0] - 5 <= ballCoords[2] <= barCoords[2] + 5:
+        if barCoords[0] <= ballCoords[2] <= barCoords[2]:
             ballVerticalDirection = BALL_DIRECTION_UP
 
 
@@ -112,7 +112,7 @@ bricks = []     # remaining bricks in the current level
 
 # GUI
 fen = Tk()
-fen.title("Balle qui bouge")
+fen.title("Casse-briques")
 fen.resizable(False, False)
 can = Canvas(fen, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, bg="black")
 backgroundImage = PhotoImage(file="images/bg1.gif")
