@@ -230,7 +230,8 @@ startLvl1Btn.pack()
 startLvl2Btn = Button(homeFrame, text="Niveau 2", highlightbackground="black", activeforeground="gray",
                       height=2, width=10, font="Andale 18", command=startLevel2)
 startLvl2Btn.pack()
-exitBtn = Button(homeFrame, text="Quitter", highlightbackground="black", activeforeground="gray", height=2, width=10, font="Andale 18", command=win.destroy)
+exitBtn = Button(homeFrame, text="Quitter", highlightbackground="black", activeforeground="gray", height=2, width=10,
+                 font="Andale 18", command=win.destroy)
 exitBtn.pack(pady=50)
 
 """ LEVEL 1 FRAME """
