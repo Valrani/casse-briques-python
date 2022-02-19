@@ -205,9 +205,6 @@ def startLevel1():
     setupLevel(0)
     for x1 in range(25, 425, 50):
         if x1 not in [175, 225]:
-            bricks.append(cans[currentCan].create_rectangle(x1, 25, x1 + 25, 50, fill=BRICK_STRENGTH_1_COLOR))
-    for x1 in range(25, 425, 50):
-        if x1 not in [175, 225]:
             bricks.append(cans[currentCan].create_rectangle(x1, 125, x1 + 25, 150, fill=BRICK_STRENGTH_2_COLOR))
     for x1 in range(25, 425, 50):
         if x1 not in [175, 225]:
