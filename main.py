@@ -50,6 +50,9 @@ def onBarMoving(event):
 
 
 def initBall():
+    global ballDirectionH, ballDirectionV
+    ballDirectionH = BALL_DIRECTION_LEFT
+    ballDirectionV = BALL_DIRECTION_UP
     return cans[currentCan].create_oval(
         (int((CANVAS_WIDTH / 2) / 5) * 5) - 5,
         CANVAS_HEIGHT - 150,
@@ -80,7 +83,6 @@ def checkBallCollisionsWithWalls():
         ballDirectionH = BALL_DIRECTION_LEFT
     if ballCoords[Y2] >= CANVAS_HEIGHT:
         looseLife()
-        ballDirectionV = BALL_DIRECTION_UP
 
 
 def checkBallCollisionsWithBar():
@@ -121,8 +123,10 @@ def hitBrick(brickId):
 
 
 def looseLife():
-    global lives
+    global lives, ballId
     lives -= 1
+    cans[currentCan].delete(ballId)
+    ballId = initBall()
     if lives <= 0:
         exitLevel(None)
 
@@ -209,12 +213,10 @@ def setupLevel(lvlIndice):
 
 def exitLevel(event):
     """ Clean the canvas, stop and reset the ball, display the home frame. """
-    global ballStop, ballDirectionH, ballDirectionV
+    global ballStop
     ballStop = True
     cans[currentCan].delete('all')
     bricks.clear()
-    ballDirectionH = BALL_DIRECTION_LEFT
-    ballDirectionV = BALL_DIRECTION_UP
     homeFrame.tkraise()
 
 
