@@ -142,11 +142,14 @@ def looseLife():
 
 
 def win():
-    global currentLvl, highestLvl, winAfterExecution, startLvl2Btn
+    global currentLvl, highestLvl, winAfterExecution, startLvl2Btn, startLvl3Btn
     if currentLvl == highestLvl:
         highestLvl += 1
+        # unlock next level if necessary
         if highestLvl == 2:
             startLvl2Btn["state"] = NORMAL
+        elif highestLvl == 3:
+            startLvl3Btn["state"] = NORMAL
     exitLevel(None)
     winAfterExecution = False
 
@@ -191,6 +194,7 @@ homeFrame = None
 looseFrame = None
 level1Frame = None
 level2Frame = None
+level3Frame = None
 
 """""""""""""""""""""""""""""""""""""""""""""""""""
 """""""""" FRAMES AND LEVELS MANAGEMENT """"""""""
@@ -226,6 +230,21 @@ def startLevel2():
         if x1 not in [175, 225]:
             bricks.append(cans[currentCan].create_rectangle(x1, 325, x1 + 25, 350, fill=BRICK_STRENGTH_2_COLOR))
     level2Frame.tkraise()
+
+
+def startLevel3():
+    setupLevel(2)
+    for x1 in range(25, 425, 50):
+        bricks.append(cans[currentCan].create_rectangle(x1, 25, x1 + 25, 50, fill=BRICK_STRENGTH_3_COLOR))
+    for x1 in range(25, 425, 50):
+        if x1 not in [25, 50, 400, 425]:
+            bricks.append(cans[currentCan].create_rectangle(x1, 125, x1 + 25, 150, fill=BRICK_STRENGTH_3_COLOR))
+    for x1 in range(25, 425, 50):
+        if x1 not in [25, 50, 400, 425]:
+            bricks.append(cans[currentCan].create_rectangle(x1, 175, x1 + 25, 200, fill=BRICK_STRENGTH_2_COLOR))
+    for x1 in range(175, 275, 50):
+        bricks.append(cans[currentCan].create_rectangle(x1, 325, x1 + 25, 350, fill=BRICK_STRENGTH_3_COLOR))
+    level3Frame.tkraise()
 
 
 def setupLevel(lvlIndice):
@@ -266,6 +285,12 @@ startLvl2Btn = Button(homeFrame, text="Niveau 2", highlightbackground="black", a
 if highestLvl < 2:
     startLvl2Btn["state"] = DISABLED
 startLvl2Btn.pack()
+startLvl3Btn = Button(homeFrame, text="Niveau 3", highlightbackground="black", activeforeground="gray",
+                      height=2, width=10, font="Andale 18", command=startLevel3)
+if highestLvl < 3:
+    startLvl3Btn["state"] = DISABLED
+startLvl3Btn.pack()
+
 exitBtn = Button(homeFrame, text="Quitter", highlightbackground="black", activeforeground="gray", height=2, width=10,
                  font="Andale 18", command=window.destroy)
 exitBtn.pack(pady=50)
@@ -299,6 +324,16 @@ level2Frame.grid(row=0, column=0)
 level2Frame.pack_propagate(False)
 can = Canvas(level2Frame, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, bg="black", highlightthickness=0)
 backgroundImage = PhotoImage(file="images/bg2.gif")
+can.pack()
+cans.append(can)
+backgroundImages.append(backgroundImage)
+
+""" LEVEL 3 FRAME """
+level3Frame = Frame(window, width=CANVAS_WIDTH, height=CANVAS_HEIGHT)
+level3Frame.grid(row=0, column=0)
+level3Frame.pack_propagate(False)
+can = Canvas(level3Frame, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, bg="black", highlightthickness=0)
+backgroundImage = PhotoImage(file="images/bg3.gif")
 can.pack()
 cans.append(can)
 backgroundImages.append(backgroundImage)
