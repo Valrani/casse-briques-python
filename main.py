@@ -145,6 +145,7 @@ currentCan = None
 win = Tk()
 win.title("Casse-briques")
 win.resizable(False, False)
+win.iconbitmap("images/icon.ico")
 homeFrame = None
 level1Frame = None
 level2Frame = None
