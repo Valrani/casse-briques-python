@@ -225,13 +225,13 @@ homeFrame.pack_propagate(False)
 titleLbl = Label(homeFrame, text="CASSE-BRIQUES", fg="black", font="Andale 30 bold")
 titleLbl.pack(pady=50)
 startLvl1Btn = Button(homeFrame, text="Niveau 1", highlightbackground="black", activeforeground="gray",
-                      command=startLevel1)
+                      height=2, width=10, font="Andale 18", command=startLevel1)
 startLvl1Btn.pack()
 startLvl2Btn = Button(homeFrame, text="Niveau 2", highlightbackground="black", activeforeground="gray",
-                      command=startLevel2)
+                      height=2, width=10, font="Andale 18", command=startLevel2)
 startLvl2Btn.pack()
-exitBtn = Button(homeFrame, text="Quitter", highlightbackground="black", activeforeground="gray", command=win.destroy)
-exitBtn.pack()
+exitBtn = Button(homeFrame, text="Quitter", highlightbackground="black", activeforeground="gray", height=2, width=10, font="Andale 18", command=win.destroy)
+exitBtn.pack(pady=50)
 
 """ LEVEL 1 FRAME """
 level1Frame = Frame(win, width=CANVAS_WIDTH, height=CANVAS_HEIGHT)
