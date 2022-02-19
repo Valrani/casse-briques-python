@@ -69,11 +69,13 @@ def moveBall():
     checkBallCollisionsWithBar()
     checkBallCollisionsWithBricks()
     cans[currentCan].move(ballId, ballDirectionH, ballDirectionV)
+    if looseLifeAfterExecution:
+        looseLife()
     win.after(ballSpeed, moveBall)
 
 
 def checkBallCollisionsWithWalls():
-    global ballDirectionH, ballDirectionV
+    global ballDirectionH, ballDirectionV, looseLifeAfterExecution
     ballCoords = cans[currentCan].coords(ballId)
     if ballCoords[X1] <= 0:
         ballDirectionH = BALL_DIRECTION_RIGHT
@@ -82,7 +84,7 @@ def checkBallCollisionsWithWalls():
     if ballCoords[X2] >= CANVAS_WIDTH:
         ballDirectionH = BALL_DIRECTION_LEFT
     if ballCoords[Y2] >= CANVAS_HEIGHT:
-        looseLife()
+        looseLifeAfterExecution = True
 
 
 def checkBallCollisionsWithBar():
@@ -123,12 +125,15 @@ def hitBrick(brickId):
 
 
 def looseLife():
-    global lives, ballId
+    global lives, ballId, looseLifeAfterExecution
     lives -= 1
     cans[currentCan].delete(ballId)
     ballId = initBall()
     if lives <= 0:
         exitLevel(None)
+        looseTxtLbl["text"] = "Il ne restait que " + str(len(bricks)) + " briques..."
+        looseFrame.tkraise()
+    looseLifeAfterExecution = False
 
 
 """""""""""""""""""""""""""""""""""""""
@@ -153,12 +158,15 @@ backgroundImages = []
 currentCan = None
 # remaining lives for the current level
 lives = None
+# used to execute the looseLife() function at the end of moveBall()
+looseLifeAfterExecution = False
 # GUI
 win = Tk()
 win.title("Casse-briques")
 win.resizable(False, False)
 win.iconbitmap("images/icon.ico")
 homeFrame = None
+looseFrame = None
 level1Frame = None
 level2Frame = None
 
@@ -203,6 +211,7 @@ def setupLevel(lvlIndice):
     global currentCan, barId, ballId, ballStop, lives
     currentCan = lvlIndice
     cans[currentCan].create_image(0, 0, image=backgroundImages[currentCan])
+    bricks.clear()
     lives = LIVES
     barId = initBar()
     cans[currentCan].bind('<Motion>', onBarMoving)
@@ -216,7 +225,6 @@ def exitLevel(event):
     global ballStop
     ballStop = True
     cans[currentCan].delete('all')
-    bricks.clear()
     homeFrame.tkraise()
 
 
@@ -235,6 +243,19 @@ startLvl2Btn.pack()
 exitBtn = Button(homeFrame, text="Quitter", highlightbackground="black", activeforeground="gray", height=2, width=10,
                  font="Andale 18", command=win.destroy)
 exitBtn.pack(pady=50)
+
+""" LOOSE FRAME """
+looseFrame = Frame(win, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, background="black")
+looseFrame.grid(row=0, column=0)
+looseFrame.pack_propagate(False)
+looseTitleLbl = Label(looseFrame, text="Perdu...", fg="red", font="Andale 24 bold")
+looseTitleLbl.pack(pady=50)
+looseTxtLbl = Label(looseFrame, fg="black", font="Andale 16")
+looseTxtLbl.pack(pady=50)
+returnBtn = Button(looseFrame, text="Retour", highlightbackground="black", activeforeground="gray", height=2, width=10,
+                 font="Andale 18", command=lambda: homeFrame.tkraise())
+returnBtn.pack(pady=50)
+
 
 """ LEVEL 1 FRAME """
 level1Frame = Frame(win, width=CANVAS_WIDTH, height=CANVAS_HEIGHT)
