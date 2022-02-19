@@ -4,7 +4,6 @@ from tkinter import *
 """"""""""""" CONSTANTS """"""""""""""
 """""""""""""""""""""""""""""""""""""""
 
-
 CANVAS_WIDTH = 425
 CANVAS_HEIGHT = 700
 BAR_OFFSET_FROM_BOTTOM = 100
@@ -15,11 +14,11 @@ BALL_DIRECTION_DOWN = 5
 BRICK_STRENGTH_1_COLOR = "yellow"
 BRICK_STRENGTH_2_COLOR = "green"
 BRICK_STRENGTH_3_COLOR = "blue"
+LIVES = 3
 X1 = 0
 Y1 = 1
 X2 = 2
 Y2 = 3
-
 
 """""""""""""""""""""""""""""""""""""""""
 """"""""""""" GAME METHODS """"""""""""""
@@ -80,6 +79,7 @@ def checkBallCollisionsWithWalls():
     if ballCoords[X2] >= CANVAS_WIDTH:
         ballDirectionH = BALL_DIRECTION_LEFT
     if ballCoords[Y2] >= CANVAS_HEIGHT:
+        looseLife()
         ballDirectionV = BALL_DIRECTION_UP
 
 
@@ -120,10 +120,16 @@ def hitBrick(brickId):
         cans[currentCan].delete(brickId)
 
 
+def looseLife():
+    global lives
+    lives -= 1
+    if lives <= 0:
+        exitLevel(None)
+
+
 """""""""""""""""""""""""""""""""""""""
 """"""""""""" VARIABLES """"""""""""""
 """""""""""""""""""""""""""""""""""""""
-
 
 barId = None
 barSize = 100
@@ -141,6 +147,8 @@ cans = []
 backgroundImages = []
 # the current canvas displayed, i.e. the position in cans
 currentCan = None
+# remaining lives for the current level
+lives = None
 # GUI
 win = Tk()
 win.title("Casse-briques")
@@ -149,7 +157,6 @@ win.iconbitmap("images/icon.ico")
 homeFrame = None
 level1Frame = None
 level2Frame = None
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""
 """""""""" FRAMES AND LEVELS MANAGEMENT """"""""""
@@ -189,9 +196,10 @@ def startLevel2():
 
 def setupLevel(lvlIndice):
     """ Initialize the background image, bar and ball for the current canvas. """
-    global currentCan, barId, ballId, ballStop
+    global currentCan, barId, ballId, ballStop, lives
     currentCan = lvlIndice
     cans[currentCan].create_image(0, 0, image=backgroundImages[currentCan])
+    lives = LIVES
     barId = initBar()
     cans[currentCan].bind('<Motion>', onBarMoving)
     ballId = initBall()
@@ -225,7 +233,6 @@ startLvl2Btn.pack()
 exitBtn = Button(homeFrame, text="Quitter", highlightbackground="black", activeforeground="gray", command=win.destroy)
 exitBtn.pack()
 
-
 """ LEVEL 1 FRAME """
 level1Frame = Frame(win, width=CANVAS_WIDTH, height=CANVAS_HEIGHT)
 level1Frame.grid(row=0, column=0)
@@ -235,7 +242,6 @@ backgroundImage = PhotoImage(file="images/bg1.gif")
 can.pack()
 cans.append(can)
 backgroundImages.append(backgroundImage)
-
 
 """ LEVEL 2 FRAME """
 level2Frame = Frame(win, width=CANVAS_WIDTH, height=CANVAS_HEIGHT)
@@ -247,11 +253,9 @@ can.pack()
 cans.append(can)
 backgroundImages.append(backgroundImage)
 
-
 """""""""""""""""""""""""""""""""""""""""""""""""""
 """""""""""""""" SOME MORE THINGS """"""""""""""""
 """""""""""""""""""""""""""""""""""""""""""""""""""
-
 
 win.bind('<Escape>', exitLevel)
 homeFrame.tkraise()
