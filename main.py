@@ -71,7 +71,9 @@ def moveBall():
     cans[currentCan].move(ballId, ballDirectionH, ballDirectionV)
     if looseLifeAfterExecution:
         looseLife()
-    win.after(ballSpeed, moveBall)
+    if winAfterExecution:
+        win()
+    window.after(ballSpeed, moveBall)
 
 
 def checkBallCollisionsWithWalls():
@@ -115,6 +117,7 @@ def checkBallCollisionsWithBricks():
 
 
 def hitBrick(brickId):
+    global winAfterExecution
     if cans[currentCan].itemcget(brickId, "fill") == BRICK_STRENGTH_3_COLOR:
         cans[currentCan].itemconfig(brickId, fill=BRICK_STRENGTH_2_COLOR)
     elif cans[currentCan].itemcget(brickId, "fill") == BRICK_STRENGTH_2_COLOR:
@@ -122,6 +125,8 @@ def hitBrick(brickId):
     elif cans[currentCan].itemcget(brickId, "fill") == BRICK_STRENGTH_1_COLOR:
         bricks.remove(brickId)
         cans[currentCan].delete(brickId)
+        if len(bricks) <= 0:
+            winAfterExecution = True
 
 
 def looseLife():
@@ -134,6 +139,16 @@ def looseLife():
         looseTxtLbl["text"] = "Il ne restait que " + str(len(bricks)) + " briques..."
         looseFrame.tkraise()
     looseLifeAfterExecution = False
+
+
+def win():
+    global currentLvl, highestLvl, winAfterExecution, startLvl2Btn
+    if currentLvl == highestLvl:
+        highestLvl += 1
+        if highestLvl == 2:
+            startLvl2Btn["state"] = NORMAL
+    exitLevel(None)
+    winAfterExecution = False
 
 
 """""""""""""""""""""""""""""""""""""""
@@ -154,17 +169,24 @@ bricks = []
 cans = []
 # same thing but with the canvas background images
 backgroundImages = []
-# the current canvas displayed, i.e. the position in cans
+# the current canvas displayed, i.e. the position in cans, starts at 0.
 currentCan = None
 # remaining lives for the current level
 lives = None
 # used to execute the looseLife() function at the end of moveBall()
 looseLifeAfterExecution = False
+# used to execute the win() function at the end of moveBall()
+winAfterExecution = False
+# the highest level beaten by the player, starts at 1.
+highestLvl = 1
+# the level currently played, starts at 1.
+currentLvl = None
+
 # GUI
-win = Tk()
-win.title("Casse-briques")
-win.resizable(False, False)
-win.iconbitmap("images/icon.ico")
+window = Tk()
+window.title("Casse-briques")
+window.resizable(False, False)
+window.iconbitmap("images/icon.ico")
 homeFrame = None
 looseFrame = None
 level1Frame = None
@@ -208,8 +230,9 @@ def startLevel2():
 
 def setupLevel(lvlIndice):
     """ Initialize the background image, bar and ball for the current canvas. """
-    global currentCan, barId, ballId, ballStop, lives
+    global currentCan, barId, ballId, ballStop, lives, currentLvl
     currentCan = lvlIndice
+    currentLvl = lvlIndice + 1
     cans[currentCan].create_image(0, 0, image=backgroundImages[currentCan])
     bricks.clear()
     lives = LIVES
@@ -222,14 +245,15 @@ def setupLevel(lvlIndice):
 
 def exitLevel(event):
     """ Clean the canvas, stop and reset the ball, display the home frame. """
-    global ballStop
+    global ballStop, currentLvl
     ballStop = True
+    currentLvl = None
     cans[currentCan].delete('all')
     homeFrame.tkraise()
 
 
 """ HOME FRAME """
-homeFrame = Frame(win, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, background="black")
+homeFrame = Frame(window, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, background="black")
 homeFrame.grid(row=0, column=0)
 homeFrame.pack_propagate(False)
 titleLbl = Label(homeFrame, text="CASSE-BRIQUES", fg="black", font="Andale 30 bold")
@@ -239,13 +263,15 @@ startLvl1Btn = Button(homeFrame, text="Niveau 1", highlightbackground="black", a
 startLvl1Btn.pack()
 startLvl2Btn = Button(homeFrame, text="Niveau 2", highlightbackground="black", activeforeground="gray",
                       height=2, width=10, font="Andale 18", command=startLevel2)
+if highestLvl < 2:
+    startLvl2Btn["state"] = DISABLED
 startLvl2Btn.pack()
 exitBtn = Button(homeFrame, text="Quitter", highlightbackground="black", activeforeground="gray", height=2, width=10,
-                 font="Andale 18", command=win.destroy)
+                 font="Andale 18", command=window.destroy)
 exitBtn.pack(pady=50)
 
 """ LOOSE FRAME """
-looseFrame = Frame(win, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, background="black")
+looseFrame = Frame(window, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, background="black")
 looseFrame.grid(row=0, column=0)
 looseFrame.pack_propagate(False)
 looseTitleLbl = Label(looseFrame, text="Perdu...", fg="red", font="Andale 24 bold")
@@ -258,7 +284,7 @@ returnBtn.pack(pady=50)
 
 
 """ LEVEL 1 FRAME """
-level1Frame = Frame(win, width=CANVAS_WIDTH, height=CANVAS_HEIGHT)
+level1Frame = Frame(window, width=CANVAS_WIDTH, height=CANVAS_HEIGHT)
 level1Frame.grid(row=0, column=0)
 level1Frame.pack_propagate(False)
 can = Canvas(level1Frame, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, bg="black", highlightthickness=0)
@@ -268,7 +294,7 @@ cans.append(can)
 backgroundImages.append(backgroundImage)
 
 """ LEVEL 2 FRAME """
-level2Frame = Frame(win, width=CANVAS_WIDTH, height=CANVAS_HEIGHT)
+level2Frame = Frame(window, width=CANVAS_WIDTH, height=CANVAS_HEIGHT)
 level2Frame.grid(row=0, column=0)
 level2Frame.pack_propagate(False)
 can = Canvas(level2Frame, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, bg="black", highlightthickness=0)
@@ -281,6 +307,6 @@ backgroundImages.append(backgroundImage)
 """""""""""""""" SOME MORE THINGS """"""""""""""""
 """""""""""""""""""""""""""""""""""""""""""""""""""
 
-win.bind('<Escape>', exitLevel)
+window.bind('<Escape>', exitLevel)
 homeFrame.tkraise()
-win.mainloop()
+window.mainloop()
