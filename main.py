@@ -8,10 +8,6 @@ from tkinter import *
 CANVAS_WIDTH = 425
 CANVAS_HEIGHT = 700
 BAR_OFFSET_FROM_BOTTOM = 100
-BALL_DIRECTION_LEFT = -5
-BALL_DIRECTION_RIGHT = 5
-BALL_DIRECTION_UP = -5
-BALL_DIRECTION_DOWN = 5
 BRICK_STRENGTH_1_COLOR = "yellow"
 BRICK_STRENGTH_2_COLOR = "green"
 BRICK_STRENGTH_3_COLOR = "blue"
@@ -52,8 +48,8 @@ def onBarMoving(event):
 
 def initBall():
     global ballDirectionH, ballDirectionV
-    ballDirectionH = BALL_DIRECTION_LEFT
-    ballDirectionV = BALL_DIRECTION_UP
+    ballDirectionH = ballDirectionLeft
+    ballDirectionV = ballDirectionUp
     return cans[currentCan].create_oval(
         (int((CANVAS_WIDTH / 2) / 5) * 5) - 5,
         CANVAS_HEIGHT - 150,
@@ -81,20 +77,33 @@ def checkBallCollisionsWithWalls():
     global ballDirectionH, ballDirectionV, looseLifeAfterExecution
     ballCoords = cans[currentCan].coords(ballId)
     if ballCoords[X1] <= 0:
-        ballDirectionH = BALL_DIRECTION_RIGHT
+        ballDirectionH = ballDirectionRight
     if ballCoords[Y1] <= 0:
-        ballDirectionV = BALL_DIRECTION_DOWN
+        ballDirectionV = ballDirectionDown
     if ballCoords[X2] >= CANVAS_WIDTH:
-        ballDirectionH = BALL_DIRECTION_LEFT
+        ballDirectionH = ballDirectionLeft
     if ballCoords[Y2] >= CANVAS_HEIGHT:
         looseLifeAfterExecution = True
 
 
 def checkBallCollisionsWithBar():
-    global ballDirectionV
+    global ballDirectionH, ballDirectionV, ballDirectionLeft, ballDirectionRight, ballDirectionUp, ballDirectionDown
     ballCoords = cans[currentCan].coords(ballId)
     if barId in cans[currentCan].find_overlapping(ballCoords[X1], ballCoords[Y1], ballCoords[X2], ballCoords[Y2]):
-        ballDirectionV = BALL_DIRECTION_UP
+        # change ball angle, depending on where the ball touch the bar (in the center or on the sides)
+        barCoords = cans[currentCan].coords(barId)
+        if barCoords[X1] + 20 < ballCoords[X2] - 5 < barCoords[X2] - 20:
+            ballDirectionLeft = -3
+            ballDirectionRight = 3
+            ballDirectionUp = -5
+            ballDirectionDown = 5
+        else:
+            ballDirectionLeft = -5
+            ballDirectionRight = 5
+            ballDirectionUp = -5
+            ballDirectionDown = 5
+        ballDirectionV = ballDirectionUp
+        ballDirectionH = ballDirectionLeft if ballDirectionH < 0 else ballDirectionRight
 
 
 def checkBallCollisionsWithBricks():
@@ -103,17 +112,17 @@ def checkBallCollisionsWithBricks():
     for brickId in bricks:
         if brickId in cans[currentCan].find_overlapping(ballCoords[X1], ballCoords[Y1], ballCoords[X2], ballCoords[Y2]):
             brickCoords = cans[currentCan].coords(brickId)
-            if ballCoords[X2] == brickCoords[X1]:
-                ballDirectionH = BALL_DIRECTION_LEFT
+            if ballCoords[X2] - brickCoords[X1] in range(-3, 3):
+                ballDirectionH = ballDirectionLeft
                 hitBrick(brickId)
-            if ballCoords[Y2] == brickCoords[Y1]:
-                ballDirectionV = BALL_DIRECTION_UP
+            elif ballCoords[Y2] - brickCoords[Y1] in range(-3, 3):
+                ballDirectionV = ballDirectionUp
                 hitBrick(brickId)
-            if ballCoords[X1] == brickCoords[X2]:
-                ballDirectionH = BALL_DIRECTION_RIGHT
+            elif ballCoords[X1] - brickCoords[X2] in range(-3, 3):
+                ballDirectionH = ballDirectionRight
                 hitBrick(brickId)
-            if ballCoords[Y1] == brickCoords[Y2]:
-                ballDirectionV = BALL_DIRECTION_DOWN
+            elif ballCoords[Y1] - brickCoords[Y2] in range(-3, 3):
+                ballDirectionV = ballDirectionDown
                 hitBrick(brickId)
 
 
@@ -159,8 +168,13 @@ barId = None
 barSize = 100
 ballId = None
 ballSpeed = 10
-ballDirectionH = BALL_DIRECTION_LEFT
-ballDirectionV = BALL_DIRECTION_UP
+# default ball speeds
+ballDirectionLeft = -5
+ballDirectionRight = 5
+ballDirectionUp = -5
+ballDirectionDown = 5
+ballDirectionH = ballDirectionLeft
+ballDirectionV = ballDirectionUp
 # True to stop the execution of moveBall()
 ballStop = None
 # remaining bricks in the current level
