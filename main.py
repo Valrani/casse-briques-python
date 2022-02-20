@@ -1,5 +1,6 @@
 from tkinter import *
 
+
 """""""""""""""""""""""""""""""""""""""
 """"""""""""" CONSTANTS """"""""""""""
 """""""""""""""""""""""""""""""""""""""
@@ -142,14 +143,10 @@ def looseLife():
 
 
 def win():
-    global currentLvl, highestLvl, winAfterExecution, startLvl2Btn, startLvl3Btn
+    global currentLvl, highestLvl, winAfterExecution
     if currentLvl == highestLvl:
         highestLvl += 1
-        # unlock next level if necessary
-        if highestLvl == 2:
-            startLvl2Btn["state"] = NORMAL
-        elif highestLvl == 3:
-            startLvl3Btn["state"] = NORMAL
+        unlockNextLevel()
     exitLevel(None)
     winAfterExecution = False
 
@@ -202,7 +199,7 @@ level3Frame = None
 
 
 def startLevel1():
-    setupLevel(0)
+    setupLevel(1)
     for x1 in range(25, 425, 50):
         if x1 not in [175, 225]:
             bricks.append(cans[currentCan].create_rectangle(x1, 125, x1 + 25, 150, fill=BRICK_STRENGTH_2_COLOR))
@@ -215,7 +212,7 @@ def startLevel1():
 
 
 def startLevel2():
-    setupLevel(1)
+    setupLevel(2)
     for x1 in range(25, 425, 50):
         if x1 not in [175, 225]:
             bricks.append(cans[currentCan].create_rectangle(x1, 25, x1 + 25, 50, fill=BRICK_STRENGTH_2_COLOR))
@@ -230,7 +227,7 @@ def startLevel2():
 
 
 def startLevel3():
-    setupLevel(2)
+    setupLevel(3)
     for x1 in range(25, 425, 50):
         bricks.append(cans[currentCan].create_rectangle(x1, 25, x1 + 25, 50, fill=BRICK_STRENGTH_3_COLOR))
     for x1 in range(25, 425, 50):
@@ -244,11 +241,11 @@ def startLevel3():
     level3Frame.tkraise()
 
 
-def setupLevel(lvlIndice):
+def setupLevel(lvl):
     """ Initialize the background image, bar and ball for the current canvas. """
     global currentCan, barId, ballId, ballStop, lives, currentLvl
-    currentCan = lvlIndice
-    currentLvl = lvlIndice + 1
+    currentCan = lvl - 1
+    currentLvl = lvl
     cans[currentCan].create_image(0, 0, image=backgroundImages[currentCan])
     bricks.clear()
     lives = LIVES
@@ -266,6 +263,14 @@ def exitLevel(event):
     currentLvl = None
     cans[currentCan].delete('all')
     homeFrame.tkraise()
+
+
+def unlockNextLevel():
+    global startLvl2Btn, startLvl3Btn
+    if highestLvl == 2:
+        startLvl2Btn["state"] = NORMAL
+    elif highestLvl == 3:
+        startLvl3Btn["state"] = NORMAL
 
 
 """ HOME FRAME """
